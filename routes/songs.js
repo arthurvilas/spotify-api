@@ -1,11 +1,11 @@
 const express = require('express');
-const mock = require("../data/mock");
+const mock = require('../data/mock');
 const router = express.Router();
 
 let musicas = JSON.parse(mock).musicas;
 
 router.get('/', (req, res) => {
-  const { search } = req.query();
+  const { search } = req.query;
   if (search) {
     const musicasFiltradas = musicas.filter(
       (musica) => musica.nome.toLowerCase().includes(search.toLowerCase())
@@ -17,7 +17,12 @@ router.get('/', (req, res) => {
 });
 
 router.get('/:id', (req, res) => {
-  res.json(musicas.filter(musica => musica.id === Number(req.params.id)));
+  const [ targetSong ] = musicas.filter(musica => musica.id === Number(req.params.id));
+  if (targetSong) {
+    res.json(targetSong);
+  } else {
+    res.status(404).json('Not Found');
+  }
 });
 
 module.exports = router;
