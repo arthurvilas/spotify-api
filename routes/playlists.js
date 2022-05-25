@@ -36,7 +36,7 @@ router.delete('/:id', (req, res) => {
   const targetIndex = playlists.findIndex(playlist => playlist.id === Number(req.params.id));
   if (targetIndex || targetIndex === 0) {
     const deletedPlaylist = playlists[targetIndex];
-    playlists = playlists.splice(targetIndex, 1);
+    playlists.splice(targetIndex, 1);
     res.json(deletedPlaylist);
   } else {
     res.status(404).json('Not found');
