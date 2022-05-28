@@ -16,7 +16,7 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/playlists", playlistsRoutes);
 app.use("/api/v1/songs", songsRoutes);
 
-// Erro
+// TODO: Erro
 // app.use(errorHandler);
 
 const port = process.env.PORT || 8080;

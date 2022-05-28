@@ -1,28 +1,27 @@
-const express = require('express');
-const mock = require('../data/mock');
+const express = require("express");
 const router = express.Router();
 
-let musicas = JSON.parse(mock).musicas;
+const Song = require("../models/Song");
 
-router.get('/', (req, res) => {
-  const { search } = req.query;
-  if (search) {
-    const musicasFiltradas = musicas.filter(
-      (musica) => musica.nome.toLowerCase().includes(search.toLowerCase())
-    );
-    res.json(musicasFiltradas);
-  } else {
-    res.status(404).send('Invalid query string');
+router.get("/", async (req, res) => {
+  const { nome, autor } = req.query;
+  const dbQuery = {};
+  if (nome) {
+    dbQuery.nome = nome;
   }
+  if (autor) {
+    dbQuery.autor = autor;
+  }
+  const songs = await Song.find(dbQuery);
+  res.json(songs);
 });
 
-router.get('/:id', (req, res) => {
-  const [ targetSong ] = musicas.filter(musica => musica.id === Number(req.params.id));
-  if (targetSong) {
-    res.json(targetSong);
-  } else {
-    res.status(404).json('Not Found');
+router.get("/:id", async (req, res) => {
+  const song = await Song.findById(req.params.id);
+  if (!song) {
+    throw new Error("Nenhuma música com id: " + req.params.id);
   }
+  res.json(song);
 });
 
 module.exports = router;

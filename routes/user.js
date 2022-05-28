@@ -1,36 +1,37 @@
-const express = require('express');
-const mock = require('../data/mock');
+const express = require("express");
 const router = express.Router();
 
-let usuarios = JSON.parse(mock).usuarios;
+const User = require("../models/User");
 
-router.post('/login', (req, res) => {
-  let logged = false;
-  usuarios.forEach((usuario) => {
-    if (usuario.email === req.body?.email && usuario.senha === req.body?.senha) {
-      res.json(usuario);
-      logged = true;
-    }
+router.post("/login", async (req, res) => {
+  const { email, senha } = req.body;
+  if (!email || !senha) {
+    throw new Error("'email' e 'senha' devem ser fornecidos");
+  }
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new Error("'email' inválido");
+  }
+  const senhaCorreta = user.validarSenha(senha);
+  if (!senhaCorreta) {
+    throw new Error("Credenciais inválidas");
+  }
+  res.json({ user });
+});
+
+router.post("/signup", async (req, res) => {
+  const user = await User.create({ ...req.body });
+  res.status(201).send(user);
+});
+
+router.patch("/:id/edit", async (req, res) => {
+  const user = await User.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
   });
-  if (!logged) {
-    res.status(401).json('Unauthorized');
+  if (!user) {
+    throw new Error("Nenhum usuário com id: " + req.params.id);
   }
-});
-
-router.post('/signup', (req, res) => {
-  let usuarioCriado = req.body;
-  usuarios = [...usuarios, usuarioCriado];
-  res.json(usuarioCriado);
-});
-
-router.patch('/:id/edit', (req, res) => {
-  const targetIndex = usuarios.findIndex(usuario => usuario.id === Number(req.params.id));
-  if (targetIndex || targetIndex === 0) {
-    usuarios[targetIndex] = { ...usuarios[targetIndex], ...req.body };
-    res.json(usuarios[targetIndex]);
-  } else {
-    res.status(404).json('Not found');
-  }
+  res.json(user);
 });
 
 module.exports = router;

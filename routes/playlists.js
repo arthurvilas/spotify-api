@@ -1,4 +1,3 @@
-const mock = require("../data/mock");
 const express = require("express");
 const router = express.Router();
 
@@ -18,7 +17,6 @@ router.get("/:id", async (req, res) => {
 });
 
 router.post("/new", async (req, res) => {
-  const { idUsuario, descricao } = req.body;
   const novaPlaylist = await Playlist.create(req.body);
   res.json(novaPlaylist);
 });

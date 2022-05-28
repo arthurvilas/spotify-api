@@ -13,7 +13,7 @@ const UserSchema = new mongoose.Schema({
   },
   dataDeNascimento: {
     type: Date,
-    required: true,
+    required: [true, "'dataDeNascimento' deve ser fornecido"],
     trim: true,
   },
   genero: {
@@ -29,7 +29,7 @@ const UserSchema = new mongoose.Schema({
   },
   senha: {
     type: String,
-    required: [true, "'senha' deve ser fornecida"],
+    required: [true, "'senha' deve ser fornecido"],
     minlength: 6,
   },
   plano: {
@@ -37,5 +37,10 @@ const UserSchema = new mongoose.Schema({
     required: [true, "'plano' deve ser fornecido"],
   },
 });
+
+// TODO: Criptografar senha
+UserSchema.methods.validarSenha = function (senhaFornecida) {
+  return this.senha === senhaFornecida;
+};
 
 module.exports = mongoose.model("User", UserSchema);
