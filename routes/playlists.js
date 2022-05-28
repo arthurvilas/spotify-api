@@ -1,46 +1,44 @@
-const mock = require('../data/mock');
-const express = require('express');
+const mock = require("../data/mock");
+const express = require("express");
 const router = express.Router();
 
-let playlists = JSON.parse(mock).playlists;
+const Playlist = require("../models/Playlist");
 
-router.get('/list', (req, res) => {
+router.get("/list", async (req, res) => {
+  const playlists = await Playlist.find({});
   res.json(playlists);
 });
 
-router.get('/:id', (req, res) => {
-  const [ targetPlaylist ] = playlists.filter(playlist => playlist.id === Number(req.params.id));
-  if (targetPlaylist) {
-    res.json(targetPlaylist);
-  } else {
-    res.status(404).json('Not Found');
+router.get("/:id", async (req, res) => {
+  const playlist = await Playlist.findById(req.params.id);
+  if (!playlist) {
+    throw new Error("Nenhuma playlist com id: " + req.params.id);
   }
+  res.status(200).json({ playlist });
 });
 
-router.post('/new', (req, res) => {
-  playlists = [...playlists, req.body];
-  res.json(playlists);
+router.post("/new", async (req, res) => {
+  const { idUsuario, descricao } = req.body;
+  const novaPlaylist = await Playlist.create(req.body);
+  res.json(novaPlaylist);
 });
 
-router.patch('/:id/edit', (req, res) => {
-  const targetIndex = playlists.findIndex(playlist => playlist.id === Number(req.params.id));
-  if (targetIndex || targetIndex === 0) {
-    playlists[targetIndex] = { ...playlists[targetIndex], ...req.body };
-    res.json(playlists[targetIndex]);
-  } else {
-    res.status(404).json('Not found');
+router.patch("/:id/edit", async (req, res) => {
+  const playlist = await Playlist.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
+  if (!playlist) {
+    throw new Error("Nenhuma playlist com id: " + req.params.id);
   }
+  res.json(playlist);
 });
 
-router.delete('/:id', (req, res) => {
-  const targetIndex = playlists.findIndex(playlist => playlist.id === Number(req.params.id));
-  if (targetIndex || targetIndex === 0) {
-    const deletedPlaylist = playlists[targetIndex];
-    playlists.splice(targetIndex, 1);
-    res.json(deletedPlaylist);
-  } else {
-    res.status(404).json('Not found');
+router.delete("/:id", async (req, res) => {
+  const playlist = await Playlist.findByIdAndDelete(req.params.id);
+  if (!playlist) {
+    throw new Error("Nenhuma playlist com id: " + req.params.id);
   }
+  res.json(playlist);
 });
 
 module.exports = router;
