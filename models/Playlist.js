@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const PlaylistSchema = new mongoose.Schema({
   idUsuario: {
-    type: Number,
+    type: mongoose.Schema.Types.ObjectId,
     required: [true, "'idUsuario' deve ser fornecido"],
   },
   descricao: {
@@ -13,7 +13,7 @@ const PlaylistSchema = new mongoose.Schema({
     type: String,
   },
   musicas: {
-    type: [Number],
+    type: [mongoose.Schema.Types.ObjectId],
   },
 });
 
